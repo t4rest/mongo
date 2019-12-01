@@ -1,0 +1,111 @@
+Array of Ancestors
+
+{
+  "_id": "<objectId>",
+  "name": "<string>",
+  "role": "<string>",
+  "department": {
+    "name": "<string>",
+    "id": "<objectId>"
+  },
+  "reports_to": [
+    { "id": "<objectId>", "name": "<string>" }
+  ]
+}
+
+Child References
+
+{
+  "_id": "<objectId>",
+  "name": "<string>",
+  "role": "<string>",
+  "department": {
+    "name": "<string>",
+    "id": "<objectId>"
+  },
+  "reports": [
+    { "id": "<objectId>", "name": "<string>" }
+  ]
+}
+
+Materialized Paths
+
+{
+  "_id": "<objectId>",
+  "name": "<string>",
+  "role": "<string>",
+  "department": {
+    "name": "<string>",
+    "id": "<objectId>"
+  },
+  "reports_to": "<string>/<string>/<string>"
+}
+
+
+
+Parent References
+
+{
+  "_id": "<objectId>",
+  "name": "<string>",
+  "role": "<string>",
+  "department": {
+    "name": "<string>",
+    "id": "<objectId>"
+  },
+  "reports_to": {
+    "id": "<objectId>",
+    "name": "<string>"
+  }
+}
+
+Using the Parent References pattern would be most efficient and straightforward approach given the requirements.
+Using as an example "Jon Yullin" and his manager "Stuart Spencer", we would get the following:
+One single database request to find the direct manager of a given employee
+
+> db.employees.find({"name": "Jon Yullin"})
+{
+"_id": ObjectId("123414123"),
+"name": "Jon Yullin",
+"role": "Intern",
+"department": {
+"name": "Engineering",
+"id": ObjectId("988576342364")
+},
+"reports_to": { "id": ObjectId("123414124") , "name": "Stuart Spencer" }
+}
+
+
+In this schema, the reports_to field gives the application the direct manager information.
+Collect all direct reports of an employee with one single and efficient query
+
+> db.employees.createIndex({"reports_to.name": 1})
+> db.employees.find({"reports_to.name": "Stuart Spencer"})
+{
+"_id": ObjectId("123414123"),
+"name": "Jon Yullin",
+"role": "Intern",
+"department": {
+"name": "Engineering",
+"id": ObjectId("988576342364")
+},
+"reports_to": { "id": ObjectId("123414124") , "name": "Stuart Spencer" }
+}
+
+In this example, querying all of our employees for anyone with the value of "Stuart Spencer" for the name of their manager, reports_to.name will give us a list of all direct reports. Creating a single field index on reports_to.name makes this query efficient.
+One single update operation to change the reporting structure of an employee
+
+> db.employees.updateOne(
+{"name": "Jon Yullin"},
+{"$set": {"reports_to": { "id":  ObjectId("123414122"), "name": "Jalpa Maganin" }}}
+)
+{
+"_id": ObjectId("123414123"),
+"name": "Jon Yullin",
+"role": "Intern",
+"department": {
+"name": "Engineering",
+"id": ObjectId("988576342364")
+},
+"reports_to": { "id":  ObjectId("123414122"), "name": "Jalpa Maganin" }
+}

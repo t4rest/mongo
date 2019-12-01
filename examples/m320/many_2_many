@@ -1,0 +1,5 @@
+users.credit_cards.number and items.reviews.body
+
+items.sold_at and items.reviews.body
+
+stores.address.street and items.description
