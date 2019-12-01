@@ -1,0 +1,14 @@
+
+{
+  "_id": "<objectId>",
+  "version": "<string>(1.0.0)",
+  "name": "<string>",
+  "role": "<string>",
+  "department": {
+    "name": "<string>",
+    "id": "<objectId>"
+  },
+  "reports_to": [
+    { "id": "<objectId>", "name": "<string>" }
+  ]
+}
